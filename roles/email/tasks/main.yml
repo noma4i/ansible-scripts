@@ -1,0 +1,21 @@
+- apt: pkg="exim4-daemon-heavy" pkg=sqlite3
+
+#
+# Set up default virtual schema, if one does not exist yet
+#
+- file: path=/var/spool/exim4/sqlite mode=0775 owner="mail" group="mail" state=directory
+- copy: src=exim_virtual_schema.sql dest=/var/spool/exim4/sqlite/schema.sql
+- name: create default virtual databases
+  command: sqlite3 userdata.sqlite -init schema.sql chdir=/var/spool/exim4/sqlite/ creates=/var/spool/exim4/sqlite/userdata.sqlite
+
+#
+# Upload exim4 config
+#
+- name: upload exim4 config
+  synchronize: >
+    src=exim4 dest=/etc
+    times=no checksum=yes
+    set_remote_user=no rsync_path="sudo rsync"
+- name: upload exim4 virtual setup
+  template: src=exim4/00_virtual_setup dest=/etc/exim4/conf.d/main/00_virtual_setup
+- service: name=exim4 enabled=yes state=restarted

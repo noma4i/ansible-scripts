@@ -1,0 +1,27 @@
+# Mail system's hostname
+MAIN_HARDCODE_PRIMARY_HOSTNAME=mail.vm
+
+# Domain to auto-add to all unqualified local recipients
+MAIN_QUALIFY_DOMAIN=vm
+
+# Allow plain text passwords for SMTP auth
+# over non-TLS-encrypted connections. Remove this line
+# to disallow them.
+AUTH_SERVER_ALLOW_NOTLS_PASSWORDS=1
+
+# Crypto algorithm to use with passwords stored in the
+# database, e.g.: sha1, md5. See "crypteq" in Exim docs
+# for details.
+PWD_CRYPTO=md5
+
+# Sqlite database file with the user data
+SQLITE_DB=/var/spool/exim4/sqlite/userdata.sqlite
+
+########################
+## Initial system setup, nothing to configure from here on!
+########################
+domainlist system_domains = @:localhost:MAIN_HARDCODE_PRIMARY_HOSTNAME
+MAIN_LOCAL_DOMAINS=@:localhost:MAIN_HARDCODE_PRIMARY_HOSTNAME:\
+		${lookup sqlite {SQLITE_DB \
+		select domain from domains where domain='${quote_sqlite:$domain}';\
+		 }}

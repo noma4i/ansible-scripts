@@ -1,0 +1,4 @@
+---
+puppet_conf: puppet.conf
+git_head: master
+git_puppet_env: .

@@ -1,0 +1,12 @@
+- group: name=svn system=yes
+- user: name=svn group=svn system=yes
+- apt: pkg=subversion
+- name: subversion repo base directory
+  file: path=/var/svn state=directory owner=svn group=svn mode=0775
+- name: create subversion log file
+  copy: dest=/var/log/svnserve.log force=no content=""
+- name: set subversion log file access
+  file: path=/var/log/svnserve.log state=file owner=svn mode=0644
+- name: subversion init script
+  copy: src=svnserve dest=/etc/init.d/svnserve
+- service: name=svnserve enabled=yes state=started

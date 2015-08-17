@@ -1,0 +1,44 @@
+---
+- name: add deploy to www-data
+  user: name=deploy append=yes groups=www-data
+
+- file: path=/var/www owner=deploy state=directory
+- name: upload ntp.conf
+  copy: src=etc/ntp.conf dest=/etc/ntp.conf
+
+
+- name: apt-get update
+  apt: update_cache=yes cache_valid_time=86400
+- name: install common packages
+  apt: name={{ item }}
+  with_items:
+    - fail2ban
+    - git-core
+    - vim
+    - screen
+    - moreutils
+    - autoconf
+    - make
+    - cmake
+    - gcc
+    - curl
+    - libxml2-dev
+    - libxslt-dev
+    - libcurl4-openssl-dev
+    - g++
+
+- service: name=fail2ban enabled=yes state=started
+
+- name: create ssh dir
+  shell: mkdir /home/deploy/.ssh
+
+- name: touch known_hosts
+  shell: touch /home/deploy/.ssh/known_hosts
+
+- name: add known ssh hosts
+  shell: ssh-keyscan -H bitbucket.org github.com > /home/deploy/.ssh/known_hosts
+  args:
+    creates: /home/deploy/.ssh/known_hosts
+
+- name: fix ownership for known hosts
+  file: path=/home/deploy/.ssh/known_hosts mode=0600 owner=deploy

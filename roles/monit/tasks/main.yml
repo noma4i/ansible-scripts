@@ -1,0 +1,8 @@
+- apt: pkg=monit
+- name: write monitrc config
+  template: >
+    src=monitrc
+    dest=/etc/monit/monitrc
+    mode=600 owner=root backup=yes
+  notify: restart monit
+- service: name=monit enabled=yes state=started

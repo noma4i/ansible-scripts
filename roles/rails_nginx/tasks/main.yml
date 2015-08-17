@@ -1,0 +1,10 @@
+- file: path={{ app_path }} owner={{ user }} group={{ group }} state=directory
+- file: path={{ app_path }}/shared owner={{ user }} group={{ group }} state=directory
+- file: path={{ app_path }}/log owner={{ user }} group={{ group }} mode=0775 state=directory
+- file: dest={{ app_path }}/shared/log src={{ app_path }}/log state=link
+- template: src={{ nginx_config }} dest=/etc/nginx/vhosts.d/{{ app_name }}.conf
+  notify: reload nginx
+  when: nginx_config is defined
+- template: src=nginx_vhost.conf dest=/etc/nginx/vhosts.d/{{ app_name }}.conf
+  notify: reload nginx
+  when: nginx_config is not defined

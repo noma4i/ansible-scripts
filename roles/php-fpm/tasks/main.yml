@@ -1,0 +1,19 @@
+---
+- name: Install php-fpm and deps
+  apt: name={{ item }} state=present
+  with_items:
+    - php5-cli
+    - php5-fpm
+    - php5-mysql
+    - php5-xcache
+
+- name: Disable default pool
+  command: mv /etc/php5/fpm/pool.d/www.conf /etc/php5/fpm/pool.d/www.disabled creates=/etc/php5/fpm/pool.d/www.disabled
+  notify: restart php5-fpm
+
+- name: Copy php-fpm configuration
+  template: src={{ item }} dest=/etc/php5/fpm/pool.d/
+  with_items: confs
+  notify: restart php5-fpm
+
+- service: name=php5-fpm enabled=yes state=started

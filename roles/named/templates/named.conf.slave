@@ -1,0 +1,24 @@
+{% for zone in zones %}
+
+zone "{{ zone }}" {
+        type slave;
+        file "/var/lib/bind/sec/{{ zone }}.zone";
+        masters {
+          {% for host in groups['dns_masters'] %}
+          {{ hostvars[host]['host_ip'] }};
+        {% endfor %}};
+
+        /* Anybody is allowed to query but transfer should be controlled */
+        /* by the master. */
+        allow-query { any; };
+        allow-transfer { none; };
+
+        /* The master should be the only one who notifies the slaves */
+        allow-notify {
+          {% for host in groups['dns_masters'] %}
+          {{ hostvars[host]['host_ip'] }};
+        {% endfor %}};
+        notify no;
+};
+
+{% endfor %}

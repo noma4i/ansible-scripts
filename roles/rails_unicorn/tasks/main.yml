@@ -1,0 +1,18 @@
+- file: path={{ app_path }} owner={{ user }} group={{ group }} state=directory
+- file: path={{ app_path }}/shared owner={{ user }} group={{ group }} state=directory
+- file: path={{ app_path }}/log owner={{ user }} group={{ group }} mode=0775 state=directory
+- file: dest={{ app_path }}/shared/log src={{ app_path }}/log state=link
+
+# rendering monit template
+- template: src={{ monit_config }} dest=/etc/monit/conf.d/{{ app_name }}.conf
+  notify: reload monit
+  when: monit_config is defined
+- template: src=monit_unicorn.conf dest=/etc/monit/conf.d/{{ app_name }}.conf
+  notify: reload monit
+  when: monit_config is not defined
+
+# rendering logrotate template
+- template: src={{ logrotate_config }} dest=/etc/logrotate.d/rails-{{ app_name }}
+  when: logrotate_config is defined
+- template: src=logrotate_d.conf dest=/etc/logrotate.d/rails-{{ app_name }}
+  when: logrotate_config is not defined

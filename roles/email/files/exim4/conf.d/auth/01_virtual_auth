@@ -1,0 +1,36 @@
+#
+# PLAIN auth
+#
+plain:
+driver 			= plaintext
+public_name 		= PLAIN
+server_set_id 		= $2
+.ifndef AUTH_SERVER_ALLOW_NOTLS_PASSWORDS
+server_advertise_condition = ${if eq{$tls_in_cipher}{}{}{*}}
+.endif
+server_condition 	= ${if crypteq {$3}{\{md5\}${lookup sqlite{SQLITE_DB \
+				SELECT password \
+				FROM users \
+				WHERE (username || '@' || domain) = '${quote_sqlite:$2}' \
+				AND smtp_allowed=1 \
+			}}}{yes}{no}}
+
+
+
+#
+# LOGIN auth
+#
+login:
+driver 			= plaintext
+public_name 		= LOGIN
+server_set_id 		= $1
+server_prompts 		= Username:: : Password::
+.ifndef AUTH_SERVER_ALLOW_NOTLS_PASSWORDS
+server_advertise_condition = ${if eq{$tls_in_cipher}{}{}{*}}
+.endif
+server_condition 	= ${if crypteq {$2}{\{md5\}${lookup sqlite{SQLITE_DB \
+				SELECT password \
+				FROM users \
+				WHERE (username || '@' || domain) = '${quote_sqlite:$1}' \
+				AND smtp_allowed=1 \
+			}}}{yes}{no}}

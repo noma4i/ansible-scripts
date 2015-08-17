@@ -1,0 +1,15 @@
+virtual_user:
+  debug_print = "R: virtual_user for $local_part@$domain"
+  driver 		= accept
+  domains 		= +local_domains
+  condition 		= ${lookup sqlite{SQLITE_DB \
+  				SELECT username || '@' || domain AS email \
+				FROM users \
+				WHERE username='${quote_sqlite:$local_part}' \
+				AND domain='${quote_sqlite:$domain}' \
+				AND smtp_allowed=1 \
+			  }{true}{false}}
+  local_part_suffix 	= +*
+  local_part_suffix_optional
+  transport 		= virtual_maildir
+  no_more

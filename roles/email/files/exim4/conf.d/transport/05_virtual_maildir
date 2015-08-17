@@ -1,0 +1,12 @@
+virtual_maildir:
+  driver 	= appendfile
+#  file 	= /var/mail/$local_part
+#  directory 	= /home/$local_part/.maildir
+  directory 	= /var/mail/domains/${domain}/${local_part}/
+  maildir_format
+  delivery_date_add
+  envelope_to_add
+  return_path_add
+  user 		= mail
+  group 	= mail
+  mode 		= 0660

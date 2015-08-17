@@ -1,0 +1,7 @@
+- name: install bind9
+  apt: pkg=bind9 state=present
+- name: set named to auto-start
+  service: name=bind9 enabled=yes state=started
+
+- include: slave.yml
+  when: mode == 'slave'

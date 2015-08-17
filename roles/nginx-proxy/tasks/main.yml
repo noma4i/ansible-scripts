@@ -1,0 +1,10 @@
+- apt: pkg=xtables-addons-dkms
+- apt: pkg=ipset
+- copy: dest="/etc/nginx/ssl/{{ssl_keyname}}.crt" src="files/ssl/{{ssl_keyname}}.crt"
+  when: ssl_keyname is defined
+  notify: reload nginx
+- copy: dest="/etc/nginx/ssl/{{ssl_keyname}}.key" src="files/ssl/{{ssl_keyname}}.key"
+  when: ssl_keyname is defined
+  notify: reload nginx
+- template: src=proxy_vhost.conf dest=/etc/nginx/vhosts.d/{{ name }}.conf
+  notify: reload nginx

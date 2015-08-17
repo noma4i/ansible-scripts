@@ -1,0 +1,22 @@
+# an alias can be specified by giving one or more db-entries that match username and domain,
+# or return a comma-seperated list of recipients.
+# when no domain is specified in db-entry, recipients are taken from all domains with a matching username
+virtual_alias:
+  debug_print = "R: virtual_alias for $local_part@$domain"
+  driver 		= redirect
+  domains 		= +local_domains
+  file_transport 	= address_file
+  pipe_transport 	= address_pipe
+  data 			= ${if or {{\
+  		   	  	def:authenticated_id\
+		 	  }{\
+		   		eq {$sender_host_address}{127.0.0.1}\
+		 	  }}{\
+  				${lookup sqlite{SQLITE_DB \
+					SELECT sendto \
+					FROM aliases \
+					WHERE ( username='${quote_sqlite:$local_part}' \
+					AND (domain='${quote_sqlite:$domain}' OR domain='*') )}}\
+		 	  }}
+  local_part_suffix 	= +*
+  local_part_suffix_optional

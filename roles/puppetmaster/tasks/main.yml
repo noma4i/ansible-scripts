@@ -1,0 +1,31 @@
+- name: download puppet repo file
+  get_url: url=http://apt.puppetlabs.com/puppetlabs-release-trusty.deb
+           dest=/tmp/puppetlabs-release-trusty.deb
+- name: install puppetmaster repo
+  command: dpkg -i /tmp/puppetlabs-release-trusty.deb
+
+- apt: update-cache=yes cache_valid_time=3600
+- name: dependencies
+  action: apt name={{item}} state=present
+  with_items:
+    - puppetmaster
+    - git
+    - ruby-dev
+    - make
+
+- name: puppet environments dir
+  file: path=/etc/puppet/environments state=directory owner={{ remote_user }}
+
+- name: upload puppet.conf
+  copy: src={{ puppet_conf }} dest=/etc/puppet/puppet.conf
+  notify: restart puppetmaster
+
+- name: initialize git repo
+  sudo: no
+  notify: restart puppetmaster
+  git: repo={{ git_repo }}
+       version={{ git_head }}
+       dest=/etc/puppet/environments/{{ git_puppet_env }}
+       accept_hostkey=yes
+
+- service: name=puppetmaster enabled=true state=started
