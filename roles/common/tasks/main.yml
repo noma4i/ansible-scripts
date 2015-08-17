@@ -30,7 +30,7 @@
 - service: name=fail2ban enabled=yes state=started
 
 - name: create ssh dir
-  shell: mkdir /home/deploy/.ssh
+  file: path=/home/deploy/.ssh state=directory
 
 - name: touch known_hosts
   shell: touch /home/deploy/.ssh/known_hosts

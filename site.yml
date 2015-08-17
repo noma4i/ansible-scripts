@@ -1,9 +1,0 @@
-- name: apply common configuration to all nodes
-  hosts: all
-  remote_user: root
-  roles:
-    - common
-    - monit
-    - rails_nginx
-    - rails_unicorn
-    - mysql_master

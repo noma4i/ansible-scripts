@@ -3,7 +3,5 @@
 - apt: pkg=libmysqlclient-dev
 - apt: pkg=mytop
 - service: name=mysql enabled=yes
-- copy: src=my.cnf dest=/etc/mysql/my.cnf backup=yes
-  notify: restart mysql
 - service: name=mysql enabled=yes state=started
 
